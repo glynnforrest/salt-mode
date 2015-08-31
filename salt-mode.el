@@ -47,11 +47,34 @@
 
 ;; Syntax highlighting: Fontification supports YAML & Jinja using mmm-mode
 
-;; Indentation: Indent expressions automatically.
-
 ;;; Code:
 
 (require 'yaml-mode)
 (require 'jinja2-mode)
-(require 'mmm-mode)
+(require 'mmm-auto)
 
+(defgroup salt nil
+  "saltstack editing commands for Emacs."
+  :link '(custom-group-link :tag "Font Lock Faces group" font-lock-faces)
+  :prefix "salt-"
+  :group 'languages)
+
+(defcustom salt-indent-level 2
+  "Indentation of YAML statements."
+  :type 'integer
+  :group 'salt
+  :safe 'integerp)
+
+;;;###autoload
+(define-derived-mode salt-mode yaml-mode "SaltStack"
+  "A major mode to edit Salt States."
+  (setq tab-width salt-indent-level
+        indent-tabs-mode nil
+        mmm-global-mode 'maybe)
+
+  (mmm-add-mode-ext-class 'salt-mode "\\.sls\\'" 'jinja2-mode))
+
+;;;###autoload
+(add-to-list 'auto-mode-alist '("\\.sls\\'" . salt-mode))
+
+(provide 'salt-mode)
