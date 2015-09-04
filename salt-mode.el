@@ -7,7 +7,7 @@
 ;; URL: https://github.com/beardedprojamz/salt-mode
 ;; Keywords: languages
 ;; Version: 0.1
-;; Package-Requires: ((yaml-mode "20150816.2235") (jinja2-mode "20141128.207) (mmm-mode "20150810.519"))
+;; Package-Requires: ((yaml-mode "0.0.12") (mmm-mode "0.5.4") (mmm-jinja2 "0.0.1"))
 
 ;; This file is not part of GNU Emacs.
 
@@ -47,11 +47,18 @@
 
 ;; Syntax highlighting: Fontification supports YAML & Jinja using mmm-mode
 
+;; Tag complete: Using mmm-mode you can generate insert templates:
+;; C-c % {
+;;   generates {{ _ }} with cursor where the underscore is
+;; C-c % #
+;; C-c % %
+;;   for {# and {% as well.
+
 ;;; Code:
 
 (require 'yaml-mode)
-(require 'jinja2-mode)
 (require 'mmm-auto)
+(require 'mmm-jinja2)
 
 (defgroup salt nil
   "saltstack editing commands for Emacs."
@@ -72,9 +79,11 @@
         indent-tabs-mode nil
         mmm-global-mode 'maybe)
 
-  (mmm-add-mode-ext-class 'salt-mode "\\.sls\\'" 'jinja2-mode))
+  (mmm-add-mode-ext-class 'salt-mode "\\.sls\\'" 'jinja2))
 
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.sls\\'" . salt-mode))
 
 (provide 'salt-mode)
+
+;;; salt-mode.el ends here

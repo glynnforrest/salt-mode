@@ -15,6 +15,8 @@ system called Salt States.
 This mode has only been tested in GNU Emacs 24. It may **not** work with GNU Emacs 23 and below,
 or with other flavors of Emacs (e.g. XEmacs).
 
+This uses [mmm-mode][] and [mmm-jinja2][] to hook up Jinja2 templates into YAML (essentially what SaltStack files are).
+
 Features
 --------
 
@@ -68,3 +70,5 @@ See [`COPYING`][copying] for the complete license.
 [MELPA Stable]: http://melpa-stable.milkbox.net/
 [Issue tracker]: https://github.com/beardedprojamz/salt-mode/issues
 [Github]: https://github.com/beardedprojamz/salt-mode
+[mmm-mode]: https://github.com/purcell/mmm-mode
+[mmm-jinja2]: https://github.com/beardedprojamz/mmm-jinja2
