@@ -39,7 +39,9 @@ states with the extension `.sls`.
 Support
 -------
 
-Feel free to ask question or make suggestions in the [issue tracker][].
+Feel free to ask questions or make suggestions in the [issue tracker][].
+
+This package was originally authored by Ben Hayden; the current maintainer is Glynn Forrest.
 
 Contribute
 ----------
@@ -62,13 +64,13 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 See [`COPYING`][copying] for the complete license.
 
 [badge-license]: https://img.shields.io/badge/license-GPL_3-green.svg
-[COPYING]: https://github.com/beardedprojamz/salt-mode/blob/master/COPYING
+[COPYING]: https://github.com/glynnforrest/salt-mode/blob/master/COPYING
 [Salt]: http://docs.saltstack.com/en/latest/
 [SaltStack]: http://http://saltstack.com/
 [GNU Emacs]: https://www.gnu.org/software/emacs/
 [MELPA]: http://melpa.milkbox.net/
 [MELPA Stable]: http://melpa-stable.milkbox.net/
-[Issue tracker]: https://github.com/beardedprojamz/salt-mode/issues
-[Github]: https://github.com/beardedprojamz/salt-mode
+[Issue tracker]: https://github.com/glynnforrest/salt-mode/issues
+[Github]: https://github.com/glynnforrest/salt-mode
 [mmm-mode]: https://github.com/purcell/mmm-mode
-[mmm-jinja2]: https://github.com/beardedprojamz/mmm-jinja2
+[mmm-jinja2]: https://github.com/glynnforrest/mmm-jinja2

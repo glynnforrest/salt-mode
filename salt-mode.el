@@ -3,8 +3,8 @@
 ;; Copyright (C) 2015  Ben Hayden
 
 ;; Author: Ben Hayden <hayden767@gmail.com>
-;; Maintainer: Ben Hayden <hayden767@gmail.com>
-;; URL: https://github.com/beardedprojamz/salt-mode
+;; Maintainer: Glynn Forrest <me@glynnforrest.com>
+;; URL: https://github.com/glynnforrest/salt-mode
 ;; Keywords: languages
 ;; Version: 0.1
 ;; Package-Requires: ((yaml-mode "0.0.12") (mmm-mode "0.5.4") (mmm-jinja2 "0.0.1"))
