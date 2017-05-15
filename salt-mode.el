@@ -77,6 +77,7 @@
   "A major mode to edit Salt States."
   (setq tab-width salt-indent-level
         indent-tabs-mode nil
+        electric-indent-inhibit t
         mmm-global-mode 'maybe)
 
   (mmm-add-mode-ext-class 'salt-mode "\\.sls\\'" 'jinja2))
