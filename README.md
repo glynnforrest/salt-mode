@@ -1,5 +1,4 @@
-Salt Mode
-===========
+# Salt Mode
 
 [![License GPL 3][badge-license]][copying]
 
@@ -17,40 +16,45 @@ or with other flavors of Emacs (e.g. XEmacs).
 
 This uses [mmm-mode][] and [mmm-jinja2][] to hook up Jinja2 templates into YAML (essentially what SaltStack files are).
 
-Features
---------
+## Features
 
-1. Syntax highlighting
-2. Indentation and alignment of expressions and statements
-3. Jinja Templating Support
+* Syntax highlighting
+* Indentation and alignment of expressions and statements
+* Jinja Templating Support
+* Spell checking of comments with flyspell
 
-Installation
-------------
+## Installation
 
 From [MELPA][] or [MELPA Stable][] with <kbd>M-x package-install RET
 salt-mode</kbd>.
 
-Usage
------
+## Usage
 
 Just visit Salt state files. The major mode is enabled automatically for Salt
 states with the extension `.sls`.
 
-Support
--------
+### Flyspell
+
+To enable flyspell for comments when using the mode:
+
+```elisp
+(add-hook 'salt-mode-hook
+        (lambda ()
+            (flyspell-mode 1)))
+```
+
+## Support
 
 Feel free to ask questions or make suggestions in the [issue tracker][].
 
 This package was originally authored by Ben Hayden; the current maintainer is Glynn Forrest.
 
-Contribute
-----------
+## Contribute
 
-- [Issue tracker][]
-- [Github][]
+* [Issue tracker][]
+* [Github][]
 
-License
--------
+## License
 
 Salt Mode is free software: you can redistribute it and/or modify it under the
 terms of the GNU General Public License as published by the Free Software
@@ -59,7 +63,7 @@ version.
 
 Salt Mode is distributed in the hope that it will be useful, but WITHOUT ANY
 WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 See [`COPYING`][copying] for the complete license.
 
