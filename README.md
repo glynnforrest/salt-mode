@@ -56,9 +56,9 @@ This package was originally authored by Ben Hayden; the current maintainer is Gl
 
 ## Contributors
 
-- Ben Hayden @deybhayden
-- Glynn Forrest @glynnforrest
-- Joe Wreschnig @joewreschnig
+- [Ben Hayden](https://github.com/deybhayden)
+- [Glynn Forrest](https://github.com/glynnforrest)
+- [Joe Wreschnig](https://github.com/joewreschnig)
 
 ## License
 
