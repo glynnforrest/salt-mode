@@ -72,6 +72,16 @@
   :group 'salt
   :safe 'integerp)
 
+(defun salt--flyspell-predicate ()
+  "Only spellcheck comments and documentation within salt-mode.
+
+Salt strings are usually configuration file data, and not
+suitable for spellchecking."
+  (memq (get-text-property (- (point) 1) 'face)
+        '(font-lock-comment-face font-lock-doc-face)))
+
+(put 'salt-mode 'flyspell-mode-predicate #'salt--flyspell-predicate)
+
 ;;;###autoload
 (define-derived-mode salt-mode yaml-mode "SaltStack"
   "A major mode to edit Salt States."
