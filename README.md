@@ -54,6 +54,12 @@ This package was originally authored by Ben Hayden; the current maintainer is Gl
 * [Issue tracker][]
 * [Github][]
 
+## Contributors
+
+- Ben Hayden @deybhayden
+- Glynn Forrest @glynnforrest
+- Joe Wreschnig @joewreschnig
+
 ## License
 
 Salt Mode is free software: you can redistribute it and/or modify it under the
