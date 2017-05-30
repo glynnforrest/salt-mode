@@ -89,7 +89,7 @@ suitable for spellchecking."
 (defconst salt-mode-requisite-types
   '("require" "watch" "prereq" "use" "onchanges" "onfail"
     "require_in" "watch_in" "prereq_in" "use_in" "onchanges_in" "onfail_in")
-  "Keys that identical special requisite relations in states.
+  "Keys that identify requisite relations between states.
 
 More about requisites can be found in the Salt documentation,
 https://docs.saltstack.com/en/latest/ref/states/requisites.html")
@@ -125,7 +125,7 @@ https://docs.saltstack.com/en/latest/ref/states/requisites.html")
      (1 'salt-mode-state-function-face))
     ;; TODO:
     ;; - Match state IDs in extend: forms and requisite lists.
-    ;; - Don't match requisites unless they're under function.
+    ;; - Don't match requisites unless they're under functions.
     ;; - Handle top, pillar, and orch files specially.
     )
   "Regexps for YAML keys with special meaning in SLS files.")
