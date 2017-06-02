@@ -51,6 +51,8 @@ Use `salt-mode-browse-doc` to browse the documentation of the state module at po
 
 When run with a prefix argument, prompt for the state module to use.
 
+If you have Python and the Salt Python modules installed, documentation may be viewed within Emacs via `C-c C-d` (`salt-mode-describe-state`) or ElDoc.
+
 ### Function jumping
 
 Use `salt-mode-forward-state-function` and `salt-mode-backward-state-function`, bound by default to <kbd>C-M-b</kbd> and <kbd>C-M-f</kbd>, to navigate by salt function.

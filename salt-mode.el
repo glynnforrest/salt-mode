@@ -1,4 +1,4 @@
-;;; salt-mode.el --- Major mode for Salt States
+;;; salt-mode.el --- Major mode for Salt States -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2015  Ben Hayden
 
@@ -7,7 +7,7 @@
 ;; URL: https://github.com/glynnforrest/salt-mode
 ;; Keywords: languages
 ;; Version: 0.1
-;; Package-Requires: ((emacs "24.3") (yaml-mode "0.0.12") (mmm-mode "0.5.4") (mmm-jinja2 "0.1"))
+;; Package-Requires: ((emacs "24.4") (yaml-mode "0.0.12") (mmm-mode "0.5.4") (mmm-jinja2 "0.1"))
 
 ;; This file is not part of GNU Emacs.
 
@@ -54,12 +54,19 @@
 ;; C-c % %
 ;;   for {# and {% as well.
 
+;; In-Emacs documentation: ElDoc and help buffers are available
+;; if you have Salt installed.
+
 ;;; Code:
 
 (require 'yaml-mode)
 (require 'mmm-auto)
 (require 'mmm-jinja2)
 (require 'thingatpt)
+(require 'json)
+(require 'subr-x)
+(require 'cl-lib)
+(require 'rst)
 
 (defgroup salt-mode nil
   "SaltStack major mode."
@@ -72,6 +79,14 @@
   :type 'integer
   :group 'salt-mode
   :safe 'integerp)
+
+(defcustom salt-mode-python-program "python"
+  "Python executable to use to inspect Salt state functions.
+
+Depending on your system's configuration, you might need to set
+this to `python2' or `python3'."
+  :type '(file :must-match t)
+  :group 'salt-mode)
 
 (defun salt-mode--flyspell-predicate ()
   "Only spellcheck comments and documentation within salt-mode.
@@ -90,10 +105,10 @@ suitable for spellchecking."
 (defun salt-mode-bounds-of-state-function-at-point ()
   "Return the bounds of the state function name at the current point."
   (save-excursion
-    (skip-chars-backward "a-z0-9_.:")
-    (when (and (looking-back (salt-mode--indented-re 1 2))
-               (looking-at "[a-z0-9_]+\\.[a-z0-9_]+"))
-      (cons (point) (match-end 0)))))
+    (skip-chars-backward "a-z0-9_.: ")
+    (when (looking-at (concat (salt-mode--indented-re 1 2)
+                              "\\([a-z0-9_]+\\.[a-z0-9_]+\\)"))
+      (cons (match-beginning 1) (match-end 1)))))
 
 (defun salt-mode-forward-state-function (&optional arg)
   "Move point forward ARG state function definitions.
@@ -136,12 +151,12 @@ backward one state function definition."
      #'salt-mode-forward-state-function)
 
 (defun salt-mode-bounds-of-state-module-at-point ()
-  "Return the bounds of the state module name at the current point."
+  "Return the bounds( of the state module name at the current point."
   (save-excursion
-    (skip-chars-backward "a-z0-9_.:")
-    (when (and (looking-back (salt-mode--indented-re 1 2))
-               (looking-at "[a-z0-9_]+"))
-      (cons (point) (match-end 0)))))
+    (skip-chars-backward "a-z0-9_.: ")
+    (when (looking-at (concat (salt-mode--indented-re 1 2)
+                              "\\([a-z0-9_]+\\)"))
+      (cons (match-beginning 1) (match-end 1)))))
 
 (put 'salt-mode-state-module 'bounds-of-thing-at-point
      #'salt-mode-bounds-of-state-module-at-point)
@@ -162,20 +177,224 @@ backward one state function definition."
               ;; no function on this line, try jumping backwards to the last state function
               (ignore-errors (salt-mode-backward-state-function)))
           (setq thing (thing-at-point 'salt-mode-state-function))))
-    (when thing
-      (set-text-properties 0 (length thing) nil thing))
     thing))
 
+(defconst salt-mode--query-template "
+try:
+    import salt.config
+    from salt.minion import SMinion
+    import json
+    opts = salt.config.minion_config('')
+    opts['file_client'] = 'local'
+    minion = SMinion(opts)
+except Exception as exc:
+    raise SystemExit(repr(exc))
+else:
+    print(json.dumps(%s, indent=4))"
+  "Python template to query the Salt minion state.
+
+This does not load the full local minion configuration, so will not
+be able to access custom states and modules.")
+
+(defun salt-mode--query-minion (program)
+  "Run Python code PROGRAM on a virtual Salt minion.
+
+Error handling is the responsibility of the caller; failures
+may occur starting the Python process or parsing its output."
+  (with-temp-buffer
+    (process-file salt-mode-python-program nil t nil "-c"
+                  (format salt-mode--query-template program))
+    (goto-char (point-min))
+    (let ((json-array-type 'list)
+          (json-object-type 'hash-table))
+      (json-read))))
+
+(defun salt-mode--async-minion (program callback)
+  "Run Python code PROGRAM on a virtual Salt minion.
+
+JSON response data is passed to CALLBACK when it is ready. Errors
+result in a message but no signal."
+  (with-demoted-errors "Unable to query Salt minion: %s"
+    (set-process-sentinel
+     (start-file-process "salt-async"
+                         ;; Work around TRAMP bug in TRAMP 2.2 / Emacs 25.1;
+                         ;; remote buffers cannot be passed by name.
+                         (get-buffer-create
+                          (generate-new-buffer-name " *salt-async*"))
+                         salt-mode-python-program "-c"
+                         (format salt-mode--query-template program))
+     (lambda (process _event)
+       (when (memq (process-status process) '(exit signal))
+         (with-current-buffer (process-buffer process)
+           (with-demoted-errors "Error querying Salt minion: %s"
+             (goto-char (point-min))
+             (condition-case nil
+                 (let ((json-array-type 'list)
+                       (json-object-type 'hash-table))
+                   (funcall callback (json-read)))
+               ((json-readtable-error)
+                (message "Error querying Salt minion: %s"
+                         (string-trim-right (buffer-string))))))
+           (kill-buffer)))))))
+
+(defmacro salt-mode--with-async-minion (program &rest body)
+  "Run Python code PROGRAM on a virtual Salt minion.
+
+BODY will run once the result is available, in the variable `result'."
+  (declare (indent 1))
+  `(salt-mode--async-minion ,program (lambda (result) ,@body)))
+
+
+(defvar salt-mode--state-argspecs nil
+  "Information about Salt states.")
+
+(defun salt-mode-refresh-data (&optional if-missing)
+  "Refresh the information about available Salt states.
+
+When IF-MISSING is set, only refresh data that is empty."
+  (interactive)
+  (unless (and salt-mode--state-argspecs if-missing)
+    (let ((was-interactive (called-interactively-p 'any)))
+      (salt-mode--with-async-minion "minion.functions.sys.state_argspec('*')"
+        (when (and result (hash-table-p result))
+          (setq salt-mode--state-argspecs result)
+          (let ((inhibit-message (not was-interactive)))
+            (message "Loaded %d Salt state function argument specifications."
+                     (hash-table-count result))))))))
+
+(defun salt-mode--state-doc (module-or-function)
+  "Return documentation for the given state MODULE-OR-FUNCTION."
+  (let ((doc (gethash module-or-function
+                      (salt-mode--query-minion
+                       (format "minion.functions.sys.state_doc(%S)"
+                               module-or-function)))))
+    (when doc (replace-regexp-in-string "^    " "" doc))))
+
+(defun salt-mode--execution-doc (module-or-function)
+  "Return documentation for the given execution MODULE-OR-FUNCTION."
+  (gethash module-or-function
+           (salt-mode--query-minion
+            (format "minion.functions.sys.doc(%S)"
+                    module-or-function))))
+
+(defcustom salt-mode-hide-eldoc-argument-values
+  '(nil :json-false "")
+  "Default values to hide from the ElDoc function summary."
+  :group 'salt-mode
+  :type '(set (const :tag "Null" nil)
+              (const :tag "Empty string" "")
+              (const :tag "False" :json-false)
+              (const :tag "True" t)))
+
+(defconst salt-mode--false-string
+  (propertize "false" 'face 'font-lock-constant-face)
+  "String to use for showing false values.")
+
+(defconst salt-mode--true-string
+  (propertize "true" 'face 'font-lock-constant-face)
+  "String to use for showing true values.")
+
+(defconst salt-mode--null-string
+  (propertize "null" 'face 'font-lock-constant-face)
+  "String to use for showing null values.")
+
+(defconst salt-mode--mandatory-string
+  (propertize "?" 'face 'font-lock-keyword-face)
+  "String to use for showing true values.")
+
+(defconst salt-mode--kwargs-string
+  (propertize "... " 'face 'font-lock-keyword-face)
+  "String to use for unknown keyword arguments.")
+
+(defun salt-mode--format-argspec (name default)
+  "Format argument NAME with value DEFAULT for display."
+  (let ((name (propertize name 'face 'font-lock-variable-name-face)))
+    (if (member default salt-mode-hide-eldoc-argument-values)
+        name
+      (format "%s: %s" name
+              (cond ((eq default :json-false) salt-mode--false-string)
+                    ((eq default t) salt-mode--true-string)
+                    ((eq default :mandatory) salt-mode--mandatory-string)
+                    ((not default) salt-mode--null-string)
+                    (t (propertize
+                        (prin1-to-string default)
+                        'face 'font-lock-string-face)))))))
+
+(defun salt-mode--eldoc ()
+  "ElDoc support for salt-mode."
+  (when salt-mode--state-argspecs
+    (let* ((state-function (salt-mode--state-module-at-point))
+           (argspec (gethash state-function salt-mode--state-argspecs)))
+      (when argspec
+        (let* ((args (gethash "args" argspec))
+               (defaults (gethash "defaults" argspec))
+               (all-defaults
+                (append (make-list (- (length args) (length defaults)) :mandatory)
+                        defaults)))
+          (format "%s: [ %s %s]"
+                  state-function
+                  (string-join
+                   (cl-mapcar #'salt-mode--format-argspec
+                              (cdr args)
+                              (cdr all-defaults))
+                   ", ")
+                  (if (gethash "kwargs" argspec)
+                      salt-mode--kwargs-string "")))))))
+
+(defvar salt-mode--doc-mode-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map special-mode-map)
+    (define-key map "g" nil)
+    map))
+
+(define-derived-mode salt-mode--doc-mode special-mode "SaltStack Doc "
+  "This mode is used to display SaltStack documentation."
+  (font-lock-add-keywords nil rst-font-lock-keywords)
+  (read-only-mode t))
+
+(put #'salt-mode--doc-mode 'mode-class 'special)
+
 (defun salt-mode--doc-read-arg ()
-  "Get the argument for interactively calling `salt-mode-browse-doc'"
+  "Read a Salt state function from the minibuffer."
   (let* ((default (salt-mode--state-module-at-point))
-         (prompt (if default
-                     (format "Open salt doc (%s): " default)
-                   "Open salt doc, e.g. file.managed: "))
-         (word (if (or current-prefix-arg (not default))
-                   (completing-read prompt nil nil nil nil nil default)
+         (prompt (if (not default)
+                     "Open salt doc, e.g. file.managed: "
+                   (set-text-properties 0 (length default) nil default)
+                   (format "Open salt doc (%s): " default)))
+         (word (if (or current-prefix-arg (not default)
+                       (and salt-mode--state-argspecs
+                            (null (gethash default salt-mode--state-argspecs))))
+                   (completing-read
+                    prompt
+                    (when salt-mode--state-argspecs
+                      (hash-table-keys salt-mode--state-argspecs))
+                    nil
+                    (when salt-mode--state-argspecs 'confirm)
+                    nil nil default)
                  default)))
     (list word)))
+
+(defun salt-mode-describe-state (module-or-function)
+  "Show documentation for the given state MODULE-OR-FUNCTION.
+
+When called interactively, use the module at point. If no module
+is found or a prefix argument is supplied, prompt for the module
+to use.
+
+This command requires Salt be installed."
+  (interactive (salt-mode--doc-read-arg))
+  (with-current-buffer-window
+   "*Salt State Doc*" nil nil
+   (let ((header (concat "Salt - States - " module-or-function "\n")))
+     (princ header)
+     (princ (make-string (1- (length header)) ?=))
+     (princ "\n"))
+   (with-temp-message
+       (format "Loading documentation for %s..." module-or-function)
+     (princ (or (salt-mode--state-doc module-or-function)
+                "No documentation available.")))
+   (goto-char (point-min))
+   (salt-mode--doc-mode)))
 
 (defun salt-mode-browse-doc (module)
   "Browse to the documentation for the state module `MODULE'.
@@ -183,10 +402,9 @@ backward one state function definition."
 `MODULE' may be the name of a state module (pkg), or the name of a
 state module and method (pkg.installed).
 
-When called interactively, use the module at point.
-If no module is found or a prefix argument is supplied, prompt for the
-module to use.
-"
+When called interactively, use the module at point. If no module
+is found or a prefix argument is supplied, prompt for the module
+to use."
   (interactive (salt-mode--doc-read-arg))
   (let* ((pieces (split-string module "\\." t " +"))
          (module (car pieces))
@@ -246,22 +464,30 @@ https://docs.saltstack.com/en/latest/ref/states/requisites.html")
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-M-b") #'salt-mode-backward-state-function)
     (define-key map (kbd "C-M-f") #'salt-mode-forward-state-function)
+    (define-key map (kbd "C-c C-d") #'salt-mode-describe-state)
     ;; (define-key map (kbd "C-M-n") 'salt-mode-forward-state-id)
     ;; (define-key map (kbd "C-M-p") 'salt-mode-backward-state-id)
     map) "Keymap for `salt-mode'.")
 
 ;;;###autoload
 (define-derived-mode salt-mode yaml-mode "SaltStack"
-  "A major mode to edit Salt States."
+  "A major mode to edit Salt States.
+
+To view documentation in Emacs or inline with ElDoc, Python and
+the Salt Python libraries must be installed on the system
+containing the files being edited. (A running minion is not
+required.)"
   (setq tab-width salt-mode-indent-level
         indent-tabs-mode nil
         electric-indent-inhibit t
         mmm-global-mode 'maybe)
 
   (setq-local yaml-indent-offset salt-mode-indent-level)
-
+  (setq-local eldoc-documentation-function #'salt-mode--eldoc)
   (mmm-add-mode-ext-class 'salt-mode "\\.sls\\'" 'jinja2)
-  (font-lock-add-keywords nil salt-mode-keywords))
+  (font-lock-add-keywords nil salt-mode-keywords)
+  (unless mmm-in-temp-buffer
+    (salt-mode-refresh-data t)))
 
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.sls\\'" . salt-mode))
