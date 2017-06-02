@@ -82,7 +82,7 @@ suitable for spellchecking."
 
 (put 'salt-mode 'flyspell-mode-predicate #'salt-mode--flyspell-predicate)
 
-(defun salt--state-module-at-point ()
+(defun salt-mode--state-module-at-point ()
   "Get the state module at point, either pkg or pkg.installed, or return nil."
   (save-excursion
     (when (looking-back ":" 1)
@@ -98,9 +98,9 @@ suitable for spellchecking."
                           (string-trim (buffer-substring-no-properties start end)))))
       (if (string= "" module) nil module))))
 
-(defun salt--doc-read-arg ()
-  "Get the argument for interactively calling `salt-open-doc'"
-  (let* ((default (salt--state-module-at-point))
+(defun salt-mode--doc-read-arg ()
+  "Get the argument for interactively calling `salt-mode-browse-doc'"
+  (let* ((default (salt-mode--state-module-at-point))
          (prompt (if default
                      (format "Open salt doc (%s): " default)
                    "Open salt doc, e.g. file.managed: "))
@@ -109,8 +109,8 @@ suitable for spellchecking."
                  default)))
     (list word)))
 
-(defun salt-open-doc (module)
-  "Open the documentation for the state module `MODULE'.
+(defun salt-mode-browse-doc (module)
+  "Browse to the documentation for the state module `MODULE'.
 
 `MODULE' may be the name of a state module (pkg), or the name of a
 state module and method (pkg.installed).
@@ -119,7 +119,7 @@ When called interactively, use the module at point.
 If no module is found or a prefix argument is supplied, prompt for the
 module to use.
 "
-  (interactive (salt--doc-read-arg))
+  (interactive (salt-mode--doc-read-arg))
   (let* ((pieces (split-string module "\\." t " +"))
          (module (car pieces))
          (url (format "https://docs.saltstack.com/en/latest/ref/states/all/salt.states.%s.html" module))
