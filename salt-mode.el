@@ -60,19 +60,19 @@
 (require 'mmm-auto)
 (require 'mmm-jinja2)
 
-(defgroup salt nil
-  "saltstack editing commands for Emacs."
+(defgroup salt-mode nil
+  "SaltStack major mode."
   :link '(custom-group-link :tag "Font Lock Faces group" font-lock-faces)
-  :prefix "salt-"
+  :prefix "salt-mode-"
   :group 'languages)
 
-(defcustom salt-indent-level 2
+(defcustom salt-mode-indent-level 2
   "Indentation of YAML statements."
   :type 'integer
-  :group 'salt
+  :group 'salt-mode
   :safe 'integerp)
 
-(defun salt--flyspell-predicate ()
+(defun salt-mode--flyspell-predicate ()
   "Only spellcheck comments and documentation within salt-mode.
 
 Salt strings are usually configuration file data, and not
@@ -80,7 +80,7 @@ suitable for spellchecking."
   (memq (get-text-property (- (point) 1) 'face)
         '(font-lock-comment-face font-lock-doc-face)))
 
-(put 'salt-mode 'flyspell-mode-predicate #'salt--flyspell-predicate)
+(put 'salt-mode 'flyspell-mode-predicate #'salt-mode--flyspell-predicate)
 
 (defun salt--state-module-at-point ()
   "Get the state module at point, either pkg or pkg.installed, or return nil."
@@ -177,7 +177,7 @@ https://docs.saltstack.com/en/latest/ref/states/requisites.html")
 ;;;###autoload
 (define-derived-mode salt-mode yaml-mode "SaltStack"
   "A major mode to edit Salt States."
-  (setq tab-width salt-indent-level
+  (setq tab-width salt-mode-indent-level
         indent-tabs-mode nil
         electric-indent-inhibit t
         mmm-global-mode 'maybe)
