@@ -9,7 +9,7 @@
 (package-initialize)
 (package-refresh-contents)
 
-(dolist (pkg '(yaml-mode mmm-jinja2))
+(dolist (pkg '(yaml-mode mmm-jinja2 package-lint))
     (unless (package-installed-p pkg)
   (package-install pkg)))
 

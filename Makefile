@@ -4,4 +4,7 @@ dev:
 clean:
 	rm -r pkgs/
 
-.PHONY: dev clean
+lint:
+	emacs --batch -Q -l test/init.el -f package-lint-batch-and-exit salt-mode.el
+
+.PHONY: dev clean lint
