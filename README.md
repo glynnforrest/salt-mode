@@ -55,6 +55,8 @@ This package was originally authored by Ben Hayden; the current maintainer is Gl
 
 Run `make dev` to load it in a new emacs.
 
+You can also use the .sls files in `test/` to test various mode functions.
+
 ## Contributors
 
 - [Ben Hayden](https://github.com/deybhayden)
