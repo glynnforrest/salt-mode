@@ -49,7 +49,7 @@ To enable flyspell for comments when using the mode:
 
 ### State documentation
 
-Use `salt-open-doc` to browse the documentation of the state module at point.
+Use `salt-mode-browse-doc` to browse the documentation of the state module at point.
 
 When run with a prefix argument, prompt for the state module to use.
 
