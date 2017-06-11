@@ -1,6 +1,9 @@
 # Salt Mode
 
 [![License GPL 3][badge-license]][copying]
+[![Build Status][badge-travis]][travis]
+[![MELPA Badge][badge-melpa]][melpa]
+[![MELPA Stable Badge][badge-melpa-stable]][melpa-stable]
 
 Salt Mode lets you edit [Salt][] states with [GNU Emacs][] 24.
 
@@ -85,6 +88,13 @@ See [`COPYING`][copying] for the complete license.
 
 [badge-license]: https://img.shields.io/badge/license-GPL_3-green.svg
 [COPYING]: https://github.com/glynnforrest/salt-mode/blob/master/COPYING
+[badge-travis]: https://travis-ci.org/glynnforrest/salt-mode.svg?branch=master
+[travis]: https://travis-ci.org/glynnforrest/salt-mode
+[badge-melpa]: https://melpa.org/packages/salt-mode-badge.svg
+[melpa]: https://melpa.org/#/salt-mode
+[badge-melpa-stable]: https://stable.melpa.org/packages/salt-mode-badge.svg
+[melpa-stable]: https://stable.melpa.org/#/salt-mode
+
 [Salt]: http://docs.saltstack.com/en/latest/
 [SaltStack]: http://http://saltstack.com/
 [GNU Emacs]: https://www.gnu.org/software/emacs/
