@@ -96,7 +96,7 @@ suitable for spellchecking."
                           (forward-char)
                           (skip-chars-forward "_.a-z0-9")
                           (setq end (point))
-                          (string-trim (buffer-substring-no-properties start end)))))
+                          (replace-regexp-in-string "^ +\\| +$" "" (buffer-substring-no-properties start end)))))
       (if (string= "" module) nil module))))
 
 (defun salt-mode--doc-read-arg ()
