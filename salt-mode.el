@@ -119,7 +119,7 @@ https://docs.saltstack.com/en/latest/ref/states/requisites.html")
      (1 'salt-mode-keyword-face))
     (,(format "^ +- *%s:" (regexp-opt salt-mode-requisite-types t))
      (1 'salt-mode-requisite-face))
-    ("^\\([^ \"':#][^\"':#\n]*\\):"
+    ("^\\([^ \"':#\n][^\"':#\n]*\\):"
      (1 'salt-mode-state-id-face))
     ("^ +\\([a-z][a-z0-9_]*\\.[a-z][a-z0-9_]*\\):?"
      (1 'salt-mode-state-function-face))
