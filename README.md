@@ -45,14 +45,15 @@ To enable flyspell for comments when using the mode:
 
 ## Support
 
-Feel free to ask questions or make suggestions in the [issue tracker][].
+Feel free to ask questions or make suggestions in the [issue tracker][] on [github][].
 
 This package was originally authored by Ben Hayden; the current maintainer is Glynn Forrest.
 
-## Contribute
+## Development
 
-* [Issue tracker][]
-* [Github][]
+`test/init.el` defines a minimal emacs configuration with the local salt-mode file loaded.
+
+Run `make dev` to load it in a new emacs.
 
 ## Contributors
 
