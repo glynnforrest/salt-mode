@@ -22,6 +22,7 @@ This uses [mmm-mode][] and [mmm-jinja2][] to hook up Jinja2 templates into YAML 
 * Indentation and alignment of expressions and statements
 * Jinja Templating Support
 * Spell checking of comments with flyspell
+* Open documentation for state functions
 
 ## Installation
 
@@ -42,6 +43,12 @@ To enable flyspell for comments when using the mode:
         (lambda ()
             (flyspell-mode 1)))
 ```
+
+### State documentation
+
+Use `salt-open-doc` to browse the documentation of the state module at point.
+
+When run with a prefix argument, prompt for the state module to use.
 
 ## Support
 
