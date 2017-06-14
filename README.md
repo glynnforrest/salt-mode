@@ -12,7 +12,7 @@ system built on top of a high-speed remote execution engine.
 Configuration management is most commonly managed by writing state files ending with `.sls`;
 this mode adds emacs support for these files.
 
-Salt-mode requires an emacs version greater than 24.3.
+Salt-mode requires a minimum emacs version of 24.3.
 
 This uses [mmm-mode][] and [mmm-jinja2][] to hook up Jinja2 templates into YAML (essentially what SaltStack files are).
 
