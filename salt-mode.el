@@ -246,6 +246,8 @@ https://docs.saltstack.com/en/latest/ref/states/requisites.html")
         electric-indent-inhibit t
         mmm-global-mode 'maybe)
 
+  (setq-local yaml-indent-offset salt-mode-indent-level)
+
   (mmm-add-mode-ext-class 'salt-mode "\\.sls\\'" 'jinja2)
   (font-lock-add-keywords nil salt-mode-keywords))
 
