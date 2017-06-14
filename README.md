@@ -1,21 +1,18 @@
-# Salt Mode
+# Salt-mode
 
 [![License GPL 3][badge-license]][copying]
 [![Build Status][badge-travis]][travis]
 [![MELPA Badge][badge-melpa]][melpa]
 [![MELPA Stable Badge][badge-melpa-stable]][melpa-stable]
 
-Salt Mode lets you edit [Salt][] states with [GNU Emacs][] 24.
+Salt-mode is a [GNU Emacs][] major mode for editing [SaltStack][] state files.
 
-Salt Mode is a major mode for [GNU Emacs][] 24 which adds support for
-[Salt][] state syntax. Salt is a different approach to infrastructure management, 
-founded on the idea that high-speed communication with large numbers of systems 
-can open up new capabilities by [SaltStack][]. On top of this communication system,
- Salt provides an extremely fast, flexible, and easy-to-use configuration management 
-system called Salt States.
+[Salt] is a Python-based configuration management and orchestration
+system built on top of a high-speed remote execution engine.
+Configuration management is most commonly managed by writing state files ending with `.sls`;
+this mode adds emacs support for these files.
 
-This mode has only been tested in GNU Emacs 24. It may **not** work with GNU Emacs 23 and below,
-or with other flavors of Emacs (e.g. XEmacs).
+Salt-mode requires an emacs version greater than 24.3.
 
 This uses [mmm-mode][] and [mmm-jinja2][] to hook up Jinja2 templates into YAML (essentially what SaltStack files are).
 
@@ -26,6 +23,7 @@ This uses [mmm-mode][] and [mmm-jinja2][] to hook up Jinja2 templates into YAML 
 * Jinja Templating Support
 * Spell checking of comments with flyspell
 * Open documentation for state functions
+* Navigation by state function
 
 ## Installation
 
@@ -53,6 +51,10 @@ Use `salt-mode-browse-doc` to browse the documentation of the state module at po
 
 When run with a prefix argument, prompt for the state module to use.
 
+### Function jumping
+
+Use `salt-mode-forward-state-function` and `salt-mode-backward-state-function`, bound by default to <kbd>C-M-b</kbd> and <kbd>C-M-f</kbd>, to navigate by salt function.
+
 ## Support
 
 Feel free to ask questions or make suggestions in the [issue tracker][] on [github][].
@@ -75,12 +77,12 @@ You can also use the .sls files in `test/` to test various mode functions.
 
 ## License
 
-Salt Mode is free software: you can redistribute it and/or modify it under the
+Salt-mode is free software: you can redistribute it and/or modify it under the
 terms of the GNU General Public License as published by the Free Software
 Foundation, either version 3 of the License, or (at your option) any later
 version.
 
-Salt Mode is distributed in the hope that it will be useful, but WITHOUT ANY
+Salt-mode is distributed in the hope that it will be useful, but WITHOUT ANY
 WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
