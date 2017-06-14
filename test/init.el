@@ -13,4 +13,11 @@
     (unless (package-installed-p pkg)
   (package-install pkg)))
 
+;; salt-mode should set yaml indentation without changing it globally
+;; The default is 2 - the value of salt-mode-indent-level.
+;; Opening test/simple.sls with this config should have a buffer local
+;; indent offset of 2, but regular yaml files should still be 4.
+(require 'yaml-mode)
+(setq yaml-indent-offset 4)
+
 (require 'salt-mode (concat salt-mode-root-dir "salt-mode.el"))
