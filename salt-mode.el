@@ -7,7 +7,7 @@
 ;; URL: https://github.com/glynnforrest/salt-mode
 ;; Keywords: languages
 ;; Version: 0.1
-;; Package-Requires: ((emacs "24.3") (yaml-mode "0.0.12") (mmm-mode "0.5.4") (mmm-jinja2 "0.1"))
+;; Package-Requires: ((emacs "24.4") (yaml-mode "0.0.12") (mmm-mode "0.5.4") (mmm-jinja2 "0.1"))
 
 ;; This file is not part of GNU Emacs.
 
