@@ -428,6 +428,14 @@ to use."
 More about requisites can be found in the Salt documentation,
 https://docs.saltstack.com/en/latest/ref/states/requisites.html")
 
+(defconst salt-mode-match-types
+  '("glob" "pcre" "grain" "grain_pcre" "list" "pillar" "pillar_pcre"
+    "pillar_exact" "ipcidr" "data" "range" "compound" "nodegroup")
+  "Minion matcher types used in top files.
+
+More information about minion targeting can be found at URL
+https://docs.saltstack.com/en/latest/ref/states/top.html")
+
 (defface salt-mode-keyword-face
   '((t (:inherit font-lock-keyword-face)))
   "Face for special Salt highstate keywords (e.g. `include')."
@@ -448,6 +456,16 @@ https://docs.saltstack.com/en/latest/ref/states/requisites.html")
   "Face for unquoted Salt state IDs."
   :group 'salt)
 
+(defface salt-mode-environment-face
+  '((t (:inherit font-lock-constant-face)))
+  "Face for unquoted Salt environment names."
+  :group 'salt)
+
+(defface salt-mode-match-type-face
+  '((t (:inherit font-lock-builtin-face)))
+  "Face for Salt minion match types."
+  :group 'salt)
+
 (defconst salt-mode-keywords
   `((,(format "^%s:" (regexp-opt salt-mode-toplevel-keywords t))
      (1 'salt-mode-keyword-face))
@@ -464,6 +482,17 @@ https://docs.saltstack.com/en/latest/ref/states/requisites.html")
     )
   "Regexps for YAML keys with special meaning in SLS files.")
 
+(defconst salt-mode-top-file-keywords
+  `((,(format "^ +- *\\(match\\) *: *%s" (regexp-opt salt-mode-match-types t))
+     (1 'salt-mode-keyword-face)
+     (2 'salt-mode-match-type-face))
+    ("^\\([^[:space:]]+\\):"
+     (1 'salt-mode-environment-face))
+    ;; TODO:
+    ;; - Highlighting for compound matchers.
+    )
+  "Regexps for Salt top files.")
+
 (defconst salt-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-M-b") #'salt-mode-backward-state-function)
@@ -472,6 +501,19 @@ https://docs.saltstack.com/en/latest/ref/states/requisites.html")
     ;; (define-key map (kbd "C-M-n") 'salt-mode-forward-state-id)
     ;; (define-key map (kbd "C-M-p") 'salt-mode-backward-state-id)
     map) "Keymap for `salt-mode'.")
+
+(defun salt-mode--set-keywords ()
+  "Set keywords appropriate for the current SLS file type."
+  (font-lock-remove-keywords nil salt-mode-top-file-keywords)
+  (font-lock-remove-keywords nil salt-mode-keywords)
+  (font-lock-add-keywords
+   nil
+   (cond ((null (buffer-file-name))
+          salt-mode-keywords)
+         ((equal (file-name-nondirectory (buffer-file-name)) "top.sls")
+          salt-mode-top-file-keywords)
+         (t salt-mode-keywords)))
+  (font-lock-flush))
 
 ;;;###autoload
 (define-derived-mode salt-mode yaml-mode "SaltStack"
@@ -489,7 +531,8 @@ required.)"
   (setq-local yaml-indent-offset salt-mode-indent-level)
   (setq-local eldoc-documentation-function #'salt-mode--eldoc)
   (mmm-add-mode-ext-class 'salt-mode "\\.sls\\'" 'jinja2)
-  (font-lock-add-keywords nil salt-mode-keywords)
+  (salt-mode--set-keywords)
+  (add-hook 'buffer-list-update-hook #'salt-mode--set-keywords nil t)
   (unless mmm-in-temp-buffer
     (salt-mode-refresh-data t)))
 
