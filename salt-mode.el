@@ -163,20 +163,24 @@ backward one state function definition."
 
 (defun salt-mode--state-module-at-point ()
   "Get the state module at point, either pkg or pkg.installed, or return nil."
-  ;; TODO return nil if looking at a state id, don't get the last
-  ;; function from the previous state id
   (let ((thing (or (thing-at-point 'salt-mode-state-function)
                    (thing-at-point 'salt-mode-state-module))))
-    (if (not thing)
-        (save-excursion
-          ;; try the first word on the current line, e.g.
+    (unless thing
+      (save-excursion
+        (beginning-of-line)
+        ;; jump around to find the closest state module if we're in a function
+        ;; assume this if the current line is indented and isn't a comment
+        (when (and (looking-at (salt-mode--indented-re 1 3))
+                   (save-excursion
+                     (skip-chars-forward " ")
+                     (not (looking-at "#"))))
+          ;; first check if the module is on the current line, e.g.
           ;; | file.managed
-          (beginning-of-line)
           (skip-chars-forward " ")
-          (if (not (thing-at-point 'salt-mode-state-function))
-              ;; no function on this line, try jumping backwards to the last state function
+          (unless (thing-at-point 'salt-mode-state-function)
+              ;; no module on this line, try jumping backwards to the last state function
               (ignore-errors (salt-mode-backward-state-function)))
-          (setq thing (thing-at-point 'salt-mode-state-function))))
+          (setq thing (thing-at-point 'salt-mode-state-function)))))
     thing))
 
 (defconst salt-mode--query-template "
