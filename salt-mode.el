@@ -508,12 +508,15 @@ https://docs.saltstack.com/en/latest/ref/states/top.html")
   (font-lock-remove-keywords nil salt-mode-keywords)
   (font-lock-add-keywords
    nil
-   (cond ((null (buffer-file-name))
+   (cond ((null buffer-file-name)
           salt-mode-keywords)
-         ((equal (file-name-nondirectory (buffer-file-name)) "top.sls")
+         ((equal (file-name-nondirectory buffer-file-name) "top.sls")
           salt-mode-top-file-keywords)
          (t salt-mode-keywords)))
   (font-lock-flush))
+
+(add-to-list 'mmm-set-file-name-for-modes 'salt-mode)
+(mmm-add-mode-ext-class 'salt-mode "\\.sls\\'" 'jinja2)
 
 ;;;###autoload
 (define-derived-mode salt-mode yaml-mode "SaltStack"
@@ -530,7 +533,6 @@ required.)"
 
   (setq-local yaml-indent-offset salt-mode-indent-level)
   (setq-local eldoc-documentation-function #'salt-mode--eldoc)
-  (mmm-add-mode-ext-class 'salt-mode "\\.sls\\'" 'jinja2)
   (salt-mode--set-keywords)
   (add-hook 'buffer-list-update-hook #'salt-mode--set-keywords nil t)
   (unless mmm-in-temp-buffer
