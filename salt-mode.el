@@ -513,7 +513,10 @@ https://docs.saltstack.com/en/latest/ref/states/top.html")
          ((equal (file-name-nondirectory buffer-file-name) "top.sls")
           salt-mode-top-file-keywords)
          (t salt-mode-keywords)))
-  (font-lock-defontify))
+  (if (fboundp 'font-lock-flush)
+      (font-lock-flush)
+    ;; use defontify as a fallback in emacs 24
+    (font-lock-defontify)))
 
 (add-to-list 'mmm-set-file-name-for-modes 'salt-mode)
 (mmm-add-mode-ext-class 'salt-mode "\\.sls\\'" 'jinja2)
