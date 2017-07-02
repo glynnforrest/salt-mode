@@ -163,8 +163,8 @@ backward one state function definition."
 
 (defun salt-mode--state-module-at-point ()
   "Get the state module at point, either pkg or pkg.installed, or return nil."
-  (let ((thing (or (thing-at-point 'salt-mode-state-function)
-                   (thing-at-point 'salt-mode-state-module))))
+  (let ((thing (or (thing-at-point 'salt-mode-state-function t)
+                   (thing-at-point 'salt-mode-state-module t))))
     (unless thing
       (save-excursion
         (beginning-of-line)
@@ -180,7 +180,7 @@ backward one state function definition."
           (unless (thing-at-point 'salt-mode-state-function)
               ;; no module on this line, try jumping backwards to the last state function
               (ignore-errors (salt-mode-backward-state-function)))
-          (setq thing (thing-at-point 'salt-mode-state-function)))))
+          (setq thing (thing-at-point 'salt-mode-state-function t)))))
     thing))
 
 (defconst salt-mode--query-template "
@@ -520,7 +520,10 @@ https://docs.saltstack.com/en/latest/ref/states/top.html")
          ((equal (file-name-nondirectory buffer-file-name) "top.sls")
           salt-mode-top-file-keywords)
          (t salt-mode-keywords)))
-  (font-lock-flush))
+  (if (fboundp 'font-lock-flush)
+      (font-lock-flush)
+    ;; use defontify as a fallback in emacs 24
+    (font-lock-defontify)))
 
 (add-to-list 'mmm-set-file-name-for-modes 'salt-mode)
 (mmm-add-mode-ext-class 'salt-mode "\\.sls\\'" 'jinja2)
