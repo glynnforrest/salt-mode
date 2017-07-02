@@ -37,8 +37,9 @@ state_two:
   (salt-test--with-buffer
    "
 remove_vim:
-  pkg.removed:
-    - name: vim
+  file.managed:
+    - name: ~/.emacs.d/init.el
+    - source: salt://init.el
     - require:
       - pkg: install_emacs
 "
@@ -49,6 +50,9 @@ remove_vim:
    (forward-char 2)
    (should (equal 'salt-mode-state-function-face (salt-test--face-at-point)))
 
-   (forward-line 2)
+   (re-search-forward "salt:")
+   (should (equal 'salt-mode-file-source-face (salt-test--face-at-point)))
+
+   (forward-line)
    (forward-char 6)
    (should (equal 'salt-mode-requisite-face (salt-test--face-at-point)))))

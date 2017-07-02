@@ -466,6 +466,11 @@ https://docs.saltstack.com/en/latest/ref/states/top.html")
   "Face for Salt minion match types."
   :group 'salt)
 
+(defface salt-mode-file-source-face
+  '((t (:inherit font-lock-builtin-face)))
+  "Face for salt:// in Salt file sources."
+  :group 'salt)
+
 (defconst salt-mode-keywords
   `((,(format "^%s:" (regexp-opt salt-mode-toplevel-keywords t))
      (1 'salt-mode-keyword-face))
@@ -475,6 +480,8 @@ https://docs.saltstack.com/en/latest/ref/states/top.html")
      (1 'salt-mode-state-id-face))
     ("^ +\\([a-z][a-z0-9_]*\\.[a-z][a-z0-9_]*\\):?"
      (1 'salt-mode-state-function-face))
+    (": *\\(salt://\\)"
+     (1 'salt-mode-file-source-face))
     ;; TODO:
     ;; - Match state IDs in extend: forms and requisite lists.
     ;; - Don't match requisites unless they're under functions.
