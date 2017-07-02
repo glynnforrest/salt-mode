@@ -1,3 +1,2 @@
-# Compiled Emacs bytecode
 *.elc
-pkgs/
+.cask/

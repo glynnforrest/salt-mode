@@ -10,4 +10,5 @@ before_install:
 
 script:
   - emacs --batch -Q --eval '(message (emacs-version))'
+  - make build
   - make lint
