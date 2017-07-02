@@ -467,7 +467,7 @@ https://docs.saltstack.com/en/latest/ref/states/top.html")
   :group 'salt)
 
 (defface salt-mode-file-source-face
-  '((t (:inherit font-lock-constant-face)))
+  '((t (:inherit font-lock-builtin-face)))
   "Face for salt:// in Salt file sources."
   :group 'salt)
 
