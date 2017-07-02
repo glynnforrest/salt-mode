@@ -14,3 +14,4 @@ install:
 script:
   - emacs --batch -Q --eval '(message (emacs-version))'
   - make lint
+  - make test
