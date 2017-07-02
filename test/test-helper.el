@@ -8,4 +8,9 @@
      (salt-mode)
      (insert ,contents)
      (goto-char (point-min))
+     (font-lock-fontify-buffer)
      ,@body))
+
+(defun salt-test--face-at-point ()
+  "Get the face at the current point."
+  (get-char-property (point) 'face))
