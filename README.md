@@ -99,11 +99,11 @@ See [`COPYING`][copying] for the complete license.
 [badge-melpa-stable]: https://stable.melpa.org/packages/salt-mode-badge.svg
 [melpa-stable]: https://stable.melpa.org/#/salt-mode
 
-[Salt]: http://docs.saltstack.com/en/latest/
-[SaltStack]: http://http://saltstack.com/
+[Salt]: https://docs.saltstack.com/en/latest/
+[SaltStack]: https://saltstack.com/
 [GNU Emacs]: https://www.gnu.org/software/emacs/
-[MELPA]: http://melpa.milkbox.net/
-[MELPA Stable]: http://melpa-stable.milkbox.net/
+[MELPA]: https://melpa.org/
+[MELPA Stable]: https://stable.melpa.org/
 [Issue tracker]: https://github.com/glynnforrest/salt-mode/issues
 [Github]: https://github.com/glynnforrest/salt-mode
 [mmm-mode]: https://github.com/purcell/mmm-mode
