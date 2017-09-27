@@ -76,6 +76,7 @@ You can also use the .sls files in `test/` to test various mode functions.
 - [Ben Hayden](https://github.com/deybhayden)
 - [Glynn Forrest](https://github.com/glynnforrest)
 - [Joe Wreschnig](https://github.com/joewreschnig)
+- [Thibault Polge](https://github.com/thblt)
 
 ## License
 
