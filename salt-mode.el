@@ -68,7 +68,7 @@
 (require 'cl-lib)
 (require 'rst)
 
-(defgroup salt-mode nil
+(defgroup salt nil
   "SaltStack major mode."
   :link '(custom-group-link :tag "Font Lock Faces group" font-lock-faces)
   :prefix "salt-mode-"
@@ -77,7 +77,7 @@
 (defcustom salt-mode-indent-level 2
   "Indentation of YAML statements."
   :type 'integer
-  :group 'salt-mode
+  :group 'salt
   :safe 'integerp)
 
 (defcustom salt-mode-python-program "python"
@@ -86,7 +86,7 @@
 Depending on your system's configuration, you might need to set
 this to `python2' or `python3'."
   :type '(file :must-match t)
-  :group 'salt-mode)
+  :group 'salt)
 
 (defun salt-mode--flyspell-predicate ()
   "Only spellcheck comments and documentation within salt-mode.
@@ -298,7 +298,7 @@ When IF-MISSING is set, only refresh data that is empty."
 (defcustom salt-mode-hide-eldoc-argument-values
   '(nil :json-false "")
   "Default values to hide from the ElDoc function summary."
-  :group 'salt-mode
+  :group 'salt
   :type '(set (const :tag "Null" nil)
               (const :tag "Empty string" "")
               (const :tag "False" :json-false)
