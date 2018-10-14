@@ -452,9 +452,37 @@ https://docs.saltstack.com/en/latest/ref/states/requisites.html")
 More information about minion targeting can be found at URL
 https://docs.saltstack.com/en/latest/ref/states/top.html")
 
+(defconst salt-mode-state-keywords
+  '("check_cmd" "failhard" "fire_event" "fun" "name" "names"
+    "onfail_stop" "onlyif" "order" "parallel" "reload_grains"
+    "reload_modules" "reload_pillar" "retry" "runas"
+    "runas_password" "saltenv" "state" "unless")
+  "Global state keywords.
+
+The actual list of keywords can be found at URL (see STATE_RUNTIME_KEYWORDS)
+https://github.com/saltstack/salt/blob/develop/salt/state.py")
+
+(defconst salt-mode-orch-keywords
+  '("arg" "fail_function" "fail_with_changes" "highstate"
+    "kwarg" "sls" "succeed_with_changes" "tgt" "tgt_type")
+  "Orchestrate keywords.
+
+The actual list of orchestrate keywords can be found at URL
+https://docs.saltstack.com/en/latest/topics/orchestrate/orchestrate_runner.html")
+
 (defface salt-mode-keyword-face
   '((t (:inherit font-lock-keyword-face)))
   "Face for special Salt highstate keywords (e.g. `include')."
+  :group 'salt)
+
+(defface salt-mode-state-keyword-face
+  '((t (:inherit font-lock-builtin-face)))
+  "Face for global Salt state keywords (e.g. `check_cmd', `retry')."
+  :group 'salt)
+
+(defface salt-mode-orch-keyword-face
+  '((t (:inherit font-lock-builtin-face)))
+  "Face for Salt orchestrate keywords (e.g. `sls', `tgt')."
   :group 'salt)
 
 (defface salt-mode-requisite-face
@@ -492,6 +520,10 @@ https://docs.saltstack.com/en/latest/ref/states/top.html")
      (1 'salt-mode-keyword-face))
     (,(format "^ +- *%s:" (regexp-opt salt-mode-requisite-types t))
      (1 'salt-mode-requisite-face))
+    (,(format "^ +- *%s:" (regexp-opt salt-mode-state-keywords t))
+     (1 'salt-mode-state-keyword-face))
+    (,(format "^ +- *%s:" (regexp-opt salt-mode-orch-keywords t))
+     (1 'salt-mode-orch-keyword-face))
     ("^\\([^ \"':#\n][^\"':#\n]*\\):"
      (1 'salt-mode-state-id-face))
     ("^ +\\([a-z][a-z0-9_]*\\.[a-z][a-z0-9_]*\\):?"
