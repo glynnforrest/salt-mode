@@ -435,8 +435,10 @@ to use."
   "Keys with special meaning at the top level of state files.")
 
 (defconst salt-mode-requisite-types
-  '("require" "watch" "prereq" "use" "onchanges" "onfail"
-    "require_in" "watch_in" "prereq_in" "use_in" "onchanges_in" "onfail_in")
+  '("listen" "listen_in" "onchanges" "onchanges_any" "onchanges_in"
+    "onfail" "onfail_any" "onfail_in" "prereq" "prereq_in"
+    "require" "require_any" "require_in" "use" "use_in"
+    "watch" "watch_any" "watch_in")
   "Keys that identify requisite relations between states.
 
 More about requisites can be found in the Salt documentation,
