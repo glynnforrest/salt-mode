@@ -525,19 +525,20 @@ https://docs.saltstack.com/en/latest/ref/states/top.html")
 
 (defun salt-mode--set-keywords ()
   "Set keywords appropriate for the current SLS file type."
-  (font-lock-remove-keywords nil salt-mode-top-file-keywords)
-  (font-lock-remove-keywords nil salt-mode-keywords)
-  (font-lock-add-keywords
-   nil
-   (cond ((null buffer-file-name)
-          salt-mode-keywords)
-         ((equal (file-name-nondirectory buffer-file-name) "top.sls")
-          salt-mode-top-file-keywords)
-         (t salt-mode-keywords)))
-  (if (fboundp 'font-lock-flush)
-      (font-lock-flush)
-    ;; use defontify as a fallback in emacs 24
-    (font-lock-defontify)))
+  (when (string= major-mode "salt-mode")
+    (font-lock-remove-keywords nil salt-mode-top-file-keywords)
+    (font-lock-remove-keywords nil salt-mode-keywords)
+    (font-lock-add-keywords
+     nil
+     (cond ((null buffer-file-name)
+            salt-mode-keywords)
+           ((equal (file-name-nondirectory buffer-file-name) "top.sls")
+            salt-mode-top-file-keywords)
+           (t salt-mode-keywords)))
+    (if (fboundp 'font-lock-flush)
+        (font-lock-flush)
+      ;; use defontify as a fallback in emacs 24
+      (font-lock-defontify))))
 
 (add-to-list 'mmm-set-file-name-for-modes 'salt-mode)
 (mmm-add-mode-ext-class 'salt-mode "\\.sls\\'" 'jinja2)
@@ -558,7 +559,7 @@ required.)"
   (setq-local yaml-indent-offset salt-mode-indent-level)
   (setq-local eldoc-documentation-function #'salt-mode--eldoc)
   (salt-mode--set-keywords)
-  (add-hook 'buffer-list-update-hook #'salt-mode--set-keywords nil t)
+  (add-hook 'post-command-hook #'salt-mode--set-keywords nil t)
   (unless mmm-in-temp-buffer
     (salt-mode-refresh-data t)))
 
