@@ -71,6 +71,19 @@ Run `make dev` to load it in a new emacs.
 
 You can also use the .sls files in `test/` to test various mode functions.
 
+## Example configuration
+
+With [`use-package`][use-package]:
+
+```elisp
+(use-package salt-mode
+  :ensure t
+  :config
+  (add-hook 'salt-mode-hook
+            (lambda ()
+              (flyspell-mode 1))))
+```
+
 ## Contributors
 
 - [Ben Hayden](https://github.com/deybhayden)
@@ -110,3 +123,4 @@ See [`COPYING`][copying] for the complete license.
 [Github]: https://github.com/glynnforrest/salt-mode
 [mmm-mode]: https://github.com/purcell/mmm-mode
 [mmm-jinja2]: https://github.com/glynnforrest/mmm-jinja2
+[use-package]: https://github.com/jwiegley/use-package
