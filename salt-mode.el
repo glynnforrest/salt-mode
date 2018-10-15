@@ -459,6 +459,8 @@ https://docs.saltstack.com/en/latest/ref/states/top.html")
     "runas_password" "saltenv" "state" "unless")
   "Global state keywords.
 
+These keywords are present in all state modules. Keywords specific to the state module, such as 'source' in file.managed, will be highlighted differently.
+
 The actual list of keywords can be found at URL (see STATE_RUNTIME_KEYWORDS)
 https://github.com/saltstack/salt/blob/develop/salt/state.py")
 
