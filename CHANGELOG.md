@@ -6,6 +6,7 @@
 
 * Font locking for state files.
 * Font locking for top files.
+* Font locking for orchestrate files.
 * Eldoc support.
 * View documentation online with `salt-mode-browse-doc`.
 * View documentation in emacs with `salt-mode-describe-state`.
