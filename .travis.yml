@@ -10,6 +10,9 @@ before_install:
 
 install:
   - make build
+  # prevents 'invalid time specification' error when running cask
+  # https://github.com/cask/cask/issues/241
+  - find .cask -name "*.elc" -delete
 
 script:
   - emacs --batch -Q --eval '(message (emacs-version))'
