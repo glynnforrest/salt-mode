@@ -57,6 +57,14 @@ If you have Python and the Salt Python modules installed, documentation may be v
 
 Use `salt-mode-forward-state-function` and `salt-mode-backward-state-function`, bound by default to <kbd>C-M-b</kbd> and <kbd>C-M-f</kbd>, to navigate by salt function.
 
+### Font locking
+
+Different font lock keywords are used depending on the value of `salt-mode--file-type`, a variable which represents the 'type' of the SLS file. This either be `'top` for top files or `'salt` for everything else.
+
+The value of `salt-mode--file-type` is detected automatically when a file is opened. You can override this by calling the function `salt-mode-set-file-type`.
+
+Future types are planned for other keywords, e.g. orchestrate and reactor files.
+
 ## Support
 
 Feel free to ask questions or make suggestions in the [issue tracker][] on [github][].
