@@ -2,10 +2,11 @@
   (add-to-list 'load-path project-dir))
 (require 'salt-mode)
 
-(defmacro salt-test--with-buffer (contents &rest body)
+(defmacro salt-test--with-buffer (type contents &rest body)
   "Run lisp forms BODY in a salt-mode buffer containing CONTENTS."
   `(with-temp-buffer
      (salt-mode)
+     (salt-mode-set-file-type ,type)
      (insert ,contents)
      (goto-char (point-min))
      (font-lock-fontify-buffer)

@@ -4,7 +4,7 @@
   (should (equal "\\.sls\\'" (car (rassoc 'salt-mode auto-mode-alist)))))
 
 (ert-deftest salt-test-module-at-point ()
-  (salt-test--with-buffer
+  (salt-test--with-buffer 'salt
    "
 state_one:
   file.managed:
@@ -34,7 +34,7 @@ state_two:
       nil))))
 
 (ert-deftest salt-test-font-lock-state-file ()
-  (salt-test--with-buffer
+  (salt-test--with-buffer 'salt
    "
 remove_vim:
   file.managed:
@@ -66,7 +66,7 @@ remove_vim:
    (should (equal 'salt-mode-requisite-face (salt-test--face-at-point)))))
 
 (ert-deftest salt-test-font-lock-orch-file ()
-  (salt-test--with-buffer
+  (salt-test--with-buffer 'salt
    "
 deploy:
   salt.state:
@@ -99,3 +99,23 @@ deploy:
    (re-search-forward "foo:")
    (backward-char 2)
    (should (equal 'font-lock-variable-name-face (salt-test--face-at-point)))))
+
+(ert-deftest salt-test-font-lock-top-file ()
+  (salt-test--with-buffer 'top
+   "
+base:
+  'os:Debian':
+    - match: grain
+    - salt.master
+    - salt.minion
+"
+   (forward-line)
+   (should (equal 'salt-mode-environment-face (salt-test--face-at-point)))
+
+   (re-search-forward "match:")
+   (backward-char 2)
+   (should (equal 'salt-mode-keyword-face (salt-test--face-at-point)))
+
+   (re-search-forward "grain")
+   (backward-char 2)
+   (should (equal 'salt-mode-match-type-face (salt-test--face-at-point)))))
