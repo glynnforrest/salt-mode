@@ -1,7 +1,7 @@
 (source gnu)
 (source melpa)
 
-(package "salt-mode" "0.1"
+(package "salt-mode" "0.2"
 "Major mode for Salt States.")
 
 (depends-on "yaml-mode" "0.0.12")
