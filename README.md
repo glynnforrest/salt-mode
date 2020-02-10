@@ -52,6 +52,7 @@ Use `salt-mode-browse-doc` to browse the documentation of the state module at po
 When run with a prefix argument, prompt for the state module to use.
 
 If you have Python and the Salt Python modules installed, documentation may be viewed within Emacs via `C-c C-d` (`salt-mode-describe-state`) or ElDoc.
+You don't need a Salt minion running for these to work.
 
 ### Function jumping
 
@@ -64,6 +65,16 @@ Different font lock keywords are used depending on the value of `salt-mode--file
 The value of `salt-mode--file-type` is detected automatically when a file is opened. You can override this by calling the function `salt-mode-set-file-type`.
 
 Future types are planned for other keywords, e.g. orchestrate and reactor files.
+
+## Troubleshooting
+
+`salt-mode-describe-state` and ElDoc will only work when your system has Python and the Salt Python modules installed.
+
+If you have the dependencies installed and these features aren't working, try running `salt-mode-refresh-data` without arguments.
+You may need to set `salt-mode-python-program` to `python2` or `python3` depending on your system's configuration.
+
+The mode should work without error if you don't have these dependencies installed.
+Visible error messages are a bug (e.g. https://github.com/glynnforrest/salt-mode/issues/18), please report them.
 
 ## Support
 
