@@ -200,18 +200,6 @@ else:
 This does not load the full local minion configuration, so will not
 be able to access custom states and modules.")
 
-(defvar salt-mode--python-packages-p nil)
-(defun salt-mode--python-packages-p ()
-  "Return t if the required python packages to query Salt are present.
-
-This function caches its result, use `salt-mode-refresh-data' to reset it."
-  (unless salt-mode--python-packages-p
-    (setq salt-mode--python-packages-p
-          (if (equal
-               0 (call-process salt-mode-python-program nil nil nil "-c"
-                               (format salt-mode--query-template "{}"))) t 0)))
-  (equal t salt-mode--python-packages-p))
-
 (defun salt-mode--query-minion (program)
   "Run Python code PROGRAM on a virtual Salt minion.
 
@@ -225,60 +213,68 @@ may occur starting the Python process or parsing its output."
           (json-object-type 'hash-table))
       (json-read))))
 
-(defun salt-mode--async-minion (program callback)
+(defun salt-mode--query-minion-async (program hide-errors callback)
   "Run Python code PROGRAM on a virtual Salt minion.
 
 JSON response data is passed to CALLBACK when it is ready. Errors
-result in a message but no signal."
-  (with-demoted-errors "Unable to query Salt minion: %s"
-    (set-process-sentinel
-     (start-file-process "salt-async"
-                         ;; Work around TRAMP bug in TRAMP 2.2 / Emacs 25.1;
-                         ;; remote buffers cannot be passed by name.
-                         (get-buffer-create
-                          (generate-new-buffer-name " *salt-async*"))
-                         salt-mode-python-program "-c"
-                         (format salt-mode--query-template program))
-     (lambda (process _event)
-       (when (memq (process-status process) '(exit signal))
-         (with-current-buffer (process-buffer process)
-           (with-demoted-errors "Error querying Salt minion: %s"
-             (goto-char (point-min))
-             (condition-case nil
-                 (let ((json-array-type 'list)
-                       (json-object-type 'hash-table))
-                   (funcall callback (json-read)))
-               ((json-readtable-error)
-                (message "Error querying Salt minion: %s"
-                         (string-trim-right (buffer-string))))))
-           (kill-buffer)))))))
+result in a message but no signal.
 
-(defmacro salt-mode--with-async-minion (program &rest body)
-  "Run Python code PROGRAM on a virtual Salt minion.
-
-BODY will run once the result is available, in the variable `result'."
-  (declare (indent 1))
-  `(salt-mode--async-minion ,program (lambda (result) ,@body)))
-
+Any errors will be demoted to simple messages. If HIDE-ERRORS is not
+nil, don't print any of these messages to the minibuffer.
+"
+  (declare (indent 2))
+  (let ((inhibit-message hide-errors))
+    (with-demoted-errors "Unable to query Salt minion: %s"
+      (set-process-sentinel
+       (start-file-process "salt-async"
+                           ;; Work around TRAMP bug in TRAMP 2.2 / Emacs 25.1;
+                           ;; remote buffers cannot be passed by name.
+                           (get-buffer-create
+                            (generate-new-buffer-name " *salt-async*"))
+                           salt-mode-python-program "-c"
+                           (format salt-mode--query-template program))
+       (lambda (process _event)
+         ;; Do this again so the sentinel messages are inhibited too
+         (let ((inhibit-message hide-errors))
+           (when (memq (process-status process) '(exit signal))
+             (with-current-buffer (process-buffer process)
+               (with-demoted-errors "Error querying Salt minion: %s"
+                 (goto-char (point-min))
+                 (condition-case nil
+                     (let ((json-array-type 'list)
+                           (json-object-type 'hash-table))
+                       (funcall callback (json-read)))
+                   ((json-readtable-error)
+                    (message "Error querying Salt minion: %s"
+                             (string-trim-right (buffer-string))))))
+               (kill-buffer)))))))))
 
 (defvar salt-mode--state-argspecs nil
   "Information about Salt states.")
 
-(defun salt-mode-refresh-data (&optional if-missing)
+(defvar salt-mode--data-fetch-attempted nil)
+
+(defun salt-mode-refresh-data (&optional first-time-only hide-errors)
   "Refresh the information about available Salt states.
 
-When IF-MISSING is set, only refresh data that is empty."
+If FIRST-TIME-ONLY is not nil, only refresh data if it has not been
+tried before.
+
+If HIDE-ERRORS is not nil, don't print any error messages to the minibuffer.
+
+If eldoc definitions aren't available and you think they should be
+(you have the salt python packages on your system), try running this
+function without arguments and observe any messages.
+"
   (interactive)
-  (unless if-missing
-    (setq salt-mode--python-packages-p nil))
-  (unless (or (and salt-mode--state-argspecs if-missing) (not (salt-mode--python-packages-p)))
-    (let ((was-interactive (called-interactively-p 'any)))
-      (salt-mode--with-async-minion "minion.functions.sys.state_argspec('*')"
+  (unless (and first-time-only salt-mode--data-fetch-attempted)
+    (setq salt-mode--data-fetch-attempted t)
+    (salt-mode--query-minion-async "minion.functions.sys.state_argspec('*')" hide-errors
+      (lambda (result)
         (when (and result (hash-table-p result))
           (setq salt-mode--state-argspecs result)
-          (let ((inhibit-message (not was-interactive)))
-            (message "Loaded %d Salt state function argument specifications."
-                     (hash-table-count result))))))))
+          (message "Salt mode data refresh completed. Loaded %d Salt state function argument specifications."
+                   (hash-table-count result)))))))
 
 (defun salt-mode--state-doc (module-or-function)
   "Return documentation for the given state MODULE-OR-FUNCTION."
@@ -612,7 +608,7 @@ required.)"
   (setq-local eldoc-documentation-function #'salt-mode--eldoc)
   (salt-mode-set-file-type (salt-mode--detect-file-type))
   (unless mmm-in-temp-buffer
-    (salt-mode-refresh-data t)))
+    (salt-mode-refresh-data t t)))
 
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.sls\\'" . salt-mode))
