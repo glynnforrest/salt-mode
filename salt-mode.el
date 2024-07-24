@@ -85,7 +85,9 @@
 
 Depending on your system's configuration, you might need to set
 this to `python2' or `python3'."
-  :type '(file :must-match t)
+  :type '(choice (const "python2")
+                 (const "python3")
+                 (string))
   :group 'salt)
 
 (defun salt-mode--flyspell-predicate ()
